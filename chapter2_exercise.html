@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Madinah Arabic - Chapter 2 Exercises</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: url("background.avif") no-repeat center center fixed;
+      background-size: cover;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      color: #2d3748;
+    }
+
+    .main-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 25px;
+      padding: 20px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
+    }
+
+    .header h1 { font-size: 2.2em; margin-bottom: 8px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+    .header p { font-size: 1.1em; opacity: 0.9; }
+
+    .chapter-badge {
+      display: inline-block;
+      padding: 6px 18px;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: #1f2937;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-bottom: 10px;
+    }
+
+    .exercise-selector {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .exercise-btn {
+      padding: 12px 24px;
+      background: rgba(255,255,255,0.9);
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    .exercise-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+    .exercise-btn.active { background: #fbbf24; color: #1f2937; }
+
+    .exercise-container {
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      padding: 35px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      display: none;
+    }
+
+    .exercise-container.active { display: block; animation: fadeIn 0.4s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .arabic-text {
+      font-family: "Arial Unicode MS", "Tahoma", sans-serif;
+      font-size: 1.8em;
+      direction: rtl;
+      line-height: 1.8;
+    }
+
+    .arabic-text-sm {
+      font-family: "Arial Unicode MS", "Tahoma", sans-serif;
+      font-size: 1.4em;
+      direction: rtl;
+    }
+
+    .level-indicator {
+      display: inline-block;
+      padding: 6px 18px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9em;
+      margin-bottom: 15px;
+    }
+
+    .instructions {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      font-size: 0.95em;
+    }
+
+    .word-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .word-card {
+      background: #f9fafb;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 15px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .word-card:hover { transform: scale(1.04); border-color: #3b82f6; box-shadow: 0 4px 12px rgba(59,130,246,0.2); }
+    .word-card.selected { background: #dbeafe; border-color: #2563eb; }
+    .word-card.matched { background: #d1fae5; border-color: #10b981; cursor: default; opacity: 0.7; }
+    .word-card.incorrect { background: #fee2e2; border-color: #ef4444; animation: shake 0.4s ease; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .question-container {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      background: #fafafa;
+    }
+
+    .blank-sentence {
+      font-size: 1.5em;
+      line-height: 2;
+      margin: 15px 0;
+      text-align: center;
+    }
+
+    .blank-input {
+      display: inline-block;
+      width: 140px;
+      padding: 6px 12px;
+      border: none;
+      border-bottom: 3px solid #3b82f6;
+      font-size: 1em;
+      text-align: center;
+      background: #eff6ff;
+      border-radius: 5px;
+      margin: 0 8px;
+    }
+
+    .blank-input:focus { outline: none; background: #dbeafe; }
+
+    .options-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    .option-btn {
+      padding: 8px 18px;
+      background: white;
+      border: 2px solid #d1d5db;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95em;
+    }
+
+    .option-btn:hover { border-color: #3b82f6; background: #eff6ff; }
+    .option-btn.chosen { background: #dbeafe; border-color: #2563eb; font-weight: 600; }
+    .option-btn.correct { background: #d1fae5; border-color: #10b981; }
+    .option-btn.wrong { background: #fee2e2; border-color: #ef4444; }
+
+    .translation-box {
+      background: #f9fafb;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 15px 0;
+    }
+
+    .translation-box h3 { margin-bottom: 10px; font-size: 1.05em; }
+
+    .translation-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 1.1em;
+      margin-top: 8px;
+    }
+
+    .translation-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+
+    .check-btn {
+      padding: 12px 36px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.05em;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 20px auto 10px;
+      display: block;
+      transition: all 0.3s ease;
+    }
+
+    .check-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16,185,129,0.4); }
+    .check-btn:disabled { background: #9ca3af; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .feedback-message {
+      padding: 14px 20px;
+      border-radius: 10px;
+      margin: 15px 0;
+      text-align: center;
+      font-size: 1em;
+      font-weight: 600;
+      display: none;
+    }
+
+    .feedback-message.success { background: #d1fae5; color: #065f46; border: 2px solid #10b981; }
+    .feedback-message.error { background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
+
+    .progress-bar {
+      height: 28px;
+      background: #e5e7eb;
+      border-radius: 14px;
+      overflow: hidden;
+      margin: 15px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #3b82f6);
+      transition: width 0.5s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.85em;
+    }
+
+    .score-board {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border-radius: 15px;
+      padding: 18px;
+      text-align: center;
+      margin: 20px 0 0;
+    }
+
+    .score-board h3 { color: #92400e; margin-bottom: 6px; }
+    .score-value { font-size: 2em; font-weight: 700; color: #b45309; }
+
+    .hint { text-align: center; color: #6b7280; font-size: 0.9em; margin: 8px 0; }
+
+    .word-bank {
+      background: #f3f4f6;
+      border-radius: 12px;
+      padding: 16px;
+      margin: 15px 0;
+    }
+
+    .word-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .word-chip {
+      padding: 8px 18px;
+      background: white;
+      border: 2px solid #d1d5db;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.1em;
+    }
+
+    .word-chip:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .word-chip.used { opacity: 0.3; cursor: not-allowed; background: #e5e7eb; }
+
+    .sentence-builder {
+      min-height: 60px;
+      border: 3px dashed #9ca3af;
+      border-radius: 12px;
+      padding: 16px;
+      margin: 12px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      background: #fafafa;
+    }
+
+    .adj-pair {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 12px;
+      margin: 8px 0;
+      background: #f9fafb;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .adj-pair .arabic-text-sm { font-size: 1.3em; }
+
+    .adj-pair select {
+      padding: 8px 14px;
+      border: 2px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1em;
+      background: white;
+    }
+
+    .adj-pair select:focus { outline: none; border-color: #3b82f6; }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 20px auto 10px;
+    }
+
+    .restart-btn {
+      padding: 8px 20px;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .restart-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(239,68,68,0.4); }
+
+    .score-text {
+      text-align: center;
+      font-size: 1.1em;
+      margin: 10px 0;
+      padding: 8px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .score-text .correct-count { color: #10b981; font-weight: 700; }
+    .score-text .wrong-count { color: #ef4444; font-weight: 700; }
+
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 2px solid #e5e7eb;
+    }
+
+    .nav-btn {
+      padding: 10px 24px;
+      background: white;
+      border: 2px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      color: #374151;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .nav-btn:hover { border-color: #3b82f6; background: #eff6ff; transform: translateY(-2px); }
+    .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .nav-btn.primary { background: #3b82f6; color: white; border-color: #3b82f6; }
+    .nav-btn.primary:hover { background: #2563eb; }
+
+    @media (max-width: 768px) {
+      .header h1 { font-size: 1.6em; }
+      .exercise-selector { flex-direction: column; align-items: center; }
+      .exercise-btn { width: 100%; max-width: 300px; }
+      .word-grid { grid-template-columns: repeat(2, 1fr); }
+      .blank-sentence { font-size: 1.2em; }
+      .exercise-container { padding: 24px; }
+      .arabic-text { font-size: 1.4em; }
+      .arabic-text-sm { font-size: 1.15em; }
+      .score-value { font-size: 1.6em; }
+      .question-container { padding: 14px; }
+      .option-btn { padding: 10px 16px; min-height: 44px; }
+      .blank-input { width: min(110px, 35vw); }
+    }
+
+    @media (max-width: 480px) {
+      .main-container { padding: 10px; }
+      .header { padding: 14px; }
+      .header h1 { font-size: 1.3em; }
+      .exercise-container { padding: 16px; }
+      .arabic-text { font-size: 1.2em; }
+      .arabic-text-sm { font-size: 1em; }
+      .blank-sentence { font-size: 1em; }
+      .word-grid { gap: 8px; }
+      .word-card { padding: 10px 6px; }
+      .word-card .icon { font-size: 1.8em; }
+      .blank-input { width: min(90px, 30vw); font-size: 0.9em; }
+      .option-btn { font-size: 0.85em; padding: 8px 14px; min-height: 40px; }
+      .check-btn { width: 100%; padding: 14px; }
+      .restart-btn { width: 100%; }
+      .score-value { font-size: 1.3em; }
+      .question-container { padding: 10px; }
+      .translation-box { padding: 14px; }
+      .translation-input { font-size: 0.95em; padding: 10px 12px; }
+      .nav-bar { flex-direction: column; gap: 8px; }
+      .nav-btn { width: 100%; text-align: center; padding: 12px; }
+      .sentence-builder { min-height: 44px; padding: 10px; }
+      .word-chip { padding: 10px 14px; font-size: 0.95em; }
+      .word-bank { padding: 10px; }
+      .btn-group { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <div class="header">
+      <div class="chapter-badge">Chapter 2: الدرس الثاني</div>
+      <h1>📖 Adjectives &amp; Descriptions</h1>
+      <p>جديد · قديم · كبير · صغير · Describing Nouns</p>
+    </div>
+
+    <div class="exercise-selector">
+      <button class="exercise-btn active" onclick="showExercise('level1')">🔤 Level 1: Adj. Match</button>
+      <button class="exercise-btn" onclick="showExercise('level2')">✏️ Level 2: Pick the Adj.</button>
+      <button class="exercise-btn" onclick="showExercise('level3')">🌍 Level 3: Translate</button>
+      <button class="exercise-btn" onclick="showExercise('level4')">🏗️ Level 4: Sentence Builder</button>
+    </div>
+
+    <!-- Level 1: Adjective Matching -->
+    <div id="level1" class="exercise-container active">
+      <span class="level-indicator">Level 1: Adjective Match</span>
+      <h2>Match Arabic Adjectives to English Meanings</h2>
+      <div class="instructions">
+        <strong>Instructions:</strong> Click an Arabic adjective, then click the matching English meaning. Match all 10 pairs!
+      </div>
+      <div class="word-grid" id="arabicWordsL1"></div>
+      <div class="word-grid" id="englishWordsL1"></div>
+      <div class="score-text" id="level1Score"></div>
+      <div class="btn-group">
+        <button class="check-btn" onclick="checkLevel1()">Check My Score</button>
+        <button class="restart-btn" onclick="restartLevel1()">🔄 Restart</button>
+      </div>
+      <div class="feedback-message" id="level1Feedback"></div>
+    </div>
+
+    <!-- Level 2: Fill in the Blanks -->
+    <div id="level2" class="exercise-container">
+      <span class="level-indicator">Level 2: Choose the Adjective</span>
+      <h2>Complete the Descriptions</h2>
+      <div class="instructions">
+        <strong>Instructions:</strong> Select the correct adjective to complete each sentence.
+      </div>
+      <div id="level2Questions"></div>
+      <div class="score-text" id="level2Score"></div>
+      <div class="btn-group">
+        <button class="check-btn" onclick="checkLevel2()">Check Answers</button>
+        <button class="restart-btn" onclick="restartLevel2()">🔄 Restart</button>
+      </div>
+      <div class="feedback-message" id="level2Feedback"></div>
+    </div>
+
+    <!-- Level 3: Translation -->
+    <div id="level3" class="exercise-container">
+      <span class="level-indicator">Level 3: Translation</span>
+      <h2>Translate Descriptive Phrases</h2>
+      <div class="instructions">
+        <strong>Instructions:</strong> Translate between Arabic and English.
+      </div>
+      <div id="level3Questions"></div>
+      <div class="score-text" id="level3Score"></div>
+      <div class="btn-group">
+        <button class="check-btn" onclick="checkLevel3()">Check Translations</button>
+        <button class="restart-btn" onclick="restartLevel3()">🔄 Restart</button>
+      </div>
+      <div class="feedback-message" id="level3Feedback"></div>
+    </div>
+
+    <!-- Level 4: Sentence Builder -->
+    <div id="level4" class="exercise-container">
+      <span class="level-indicator">Level 4: Sentence Building</span>
+      <h2>Build Descriptive Sentences</h2>
+      <div class="instructions">
+        <strong>Instructions:</strong> Click words to build the correct Arabic sentence matching the English prompt.
+      </div>
+      <div id="level4Questions"></div>
+      <div class="score-text" id="level4Score"></div>
+      <div class="btn-group">
+        <button class="check-btn" onclick="checkLevel4()">Check Sentences</button>
+        <button class="restart-btn" onclick="restartLevel4()">🔄 Restart</button>
+      </div>
+      <div class="feedback-message" id="level4Feedback"></div>
+    </div>
+
+    <div class="score-board">
+      <h3>🏆 Chapter Progress</h3>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressBar" style="width: 0%">0 / 4 Complete</div>
+      </div>
+      <div class="score-value" id="totalScore">0 / 4</div>
+      <p>Levels Completed</p>
+    </div>
+
+    <div class="nav-bar">
+      <a href="index.html" class="nav-btn">🏠 Home</a>
+      <a href="chapter1_exercise.html" class="nav-btn">◀ Previous</a>
+      <a href="chapter3_exercise.html" class="nav-btn primary">Next Chapter ▶</a>
+    </div>
+  </div>
+
+  <script>
+    // --- DATA ---
+    const adjectives = [
+      { arabic: "جَدِيد", english: "New" },
+      { arabic: "قَدِيم", english: "Old" },
+      { arabic: "كَبِير", english: "Big" },
+      { arabic: "صَغِير", english: "Small" },
+      { arabic: "قَرِيب", english: "Near" },
+      { arabic: "بَعِيد", english: "Far" },
+      { arabic: "مَكْسُور", english: "Broken" },
+      { arabic: "نَظِيف", english: "Clean" },
+      { arabic: "جَالِس", english: "Sitting" },
+      { arabic: "وَاقِف", english: "Standing" }
+    ];
+
+    const fillBlankPhrases = [
+      { noun: "البَيْت", adj: "كَبِير", options: ["كَبِير", "صَغِير", "قَدِيم"], english: "The house is big" },
+      { noun: "القَلَم", adj: "مَكْسُور", options: ["جَدِيد", "مَكْسُور", "نَظِيف"], english: "The pen is broken" },
+      { noun: "المُدَرِّس", adj: "جَالِس", options: ["جَالِس", "وَاقِف", "جَدِيد"], english: "The teacher is sitting" },
+      { noun: "الكِتَاب", adj: "جَدِيد", options: ["قَدِيم", "كَبِير", "جَدِيد"], english: "The book is new" },
+      { noun: "المَسْجِد", adj: "قَرِيب", options: ["بَعِيد", "قَرِيب", "كَبِير"], english: "The mosque is near" },
+      { noun: "السَّيَّارَة", adj: "نَظِيفَة", options: ["نَظِيفَة", "مَكْسُورَة", "صَغِيرَة"], english: "The car is clean" }
+    ];
+
+    const translations = [
+      { fromArabic: true, text: "المُدَرِّس جَدِيد", answer: "The teacher is new" },
+      { fromArabic: false, text: "The house is big", answer: "البَيْت كَبِير" },
+      { fromArabic: true, text: "القَلَم مَكْسُور", answer: "The pen is broken" },
+      { fromArabic: false, text: "The mosque is near", answer: "المَسْجِد قَرِيب" },
+      { fromArabic: true, text: "المُدَرِّس جَالِس والطَّالِب وَاقِف", answer: "The teacher is sitting and the student is standing" },
+      { fromArabic: false, text: "The book is new and the pen is old", answer: "الكِتَاب جَدِيد والقَلَم قَدِيم" }
+    ];
+
+    const sentenceBuilds = [
+      { english: "The teacher is new", correct: "المُدَرِّس جَدِيد", words: ["المُدَرِّس", "الطَّالِب", "جَدِيد", "قَدِيم", "كَبِير"] },
+      { english: "The pen is broken", correct: "القَلَم مَكْسُور", words: ["القَلَم", "الكِتَاب", "جَدِيد", "مَكْسُور", "نَظِيف"] },
+      { english: "The mosque is near", correct: "المَسْجِد قَرِيب", words: ["المَسْجِد", "البَيْت", "قَرِيب", "بَعِيد", "كَبِير"] },
+      { english: "The book is new", correct: "الكِتَاب جَدِيد", words: ["الكِتَاب", "القَلَم", "جَدِيد", "قَدِيم", "صَغِير"] }
+    ];
+
+    // --- STATE ---
+    let completedLevels = new Set();
+    let selectedArabic = null;
+    let matchPairs = {};
+
+    function showExercise(levelId) {
+      document.querySelectorAll(".exercise-container").forEach(c => c.classList.remove("active"));
+      document.querySelectorAll(".exercise-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById(levelId).classList.add("active");
+      document.querySelector(`.exercise-btn[onclick="showExercise('${levelId}')"]`).classList.add("active");
+    }
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function updateProgress() {
+      const total = 4;
+      const count = completedLevels.size;
+      const pct = (count / total) * 100;
+      document.getElementById("progressBar").style.width = `${pct}%`;
+      document.getElementById("progressBar").textContent = `${count} / ${total} Complete`;
+      document.getElementById("totalScore").textContent = `${count} / ${total}`;
+    }
+
+    function showFeedback(elId, success, msg) {
+      const el = document.getElementById(elId);
+      el.className = success ? "feedback-message success" : "feedback-message error";
+      el.textContent = msg;
+      el.style.display = "block";
+    }
+
+    function showScore(scoreId, correct, total) {
+      const el = document.getElementById(scoreId);
+      el.style.display = "block";
+      el.style.background = correct === total ? "#d1fae5" : "#fff3cd";
+      el.textContent = correct === total ? `✅ ${correct}/${total} correct` : `${correct}/${total} correct`;
+    }
+
+    // --- LEVEL 1: ADJECTIVE MATCH ---
+    function initLevel1() {
+      const arabicContainer = document.getElementById("arabicWordsL1");
+      const englishContainer = document.getElementById("englishWordsL1");
+      arabicContainer.innerHTML = "";
+      englishContainer.innerHTML = "";
+
+      const shuffledA = shuffle([...adjectives]);
+      const shuffledE = shuffle([...adjectives]);
+
+      shuffledA.forEach(v => {
+        const card = document.createElement("div");
+        card.className = "word-card arabic-text-sm";
+        card.dataset.pair = v.english.toLowerCase();
+        card.textContent = v.arabic;
+        card.addEventListener("click", function() {
+          if (this.classList.contains("matched")) return;
+          document.querySelectorAll("#arabicWordsL1 .word-card").forEach(c => c.classList.remove("selected"));
+          this.classList.add("selected");
+          selectedArabic = this;
+        });
+        arabicContainer.appendChild(card);
+      });
+
+      shuffledE.forEach(v => {
+        const card = document.createElement("div");
+        card.className = "word-card";
+        card.dataset.pair = v.english.toLowerCase();
+        card.innerHTML = `<span class="label" style="font-size:1.1em;font-weight:600">${v.english}</span>`;
+        card.addEventListener("click", function() {
+          if (!selectedArabic || this.classList.contains("matched")) return;
+          if (selectedArabic.dataset.pair === this.dataset.pair) {
+            this.classList.add("matched");
+            selectedArabic.classList.add("matched");
+            selectedArabic.classList.remove("selected");
+            matchPairs[this.dataset.pair] = true;
+            selectedArabic = null;
+          } else {
+            this.classList.add("incorrect");
+            setTimeout(() => this.classList.remove("incorrect"), 400);
+          }
+        });
+        englishContainer.appendChild(card);
+      });
+    }
+
+    function checkLevel1() {
+      const total = adjectives.length;
+      const correct = Object.keys(matchPairs).length;
+      showScore("level1Score", correct, total);
+      if (correct === total) {
+        showFeedback("level1Feedback", true, "🎉 All 10 adjectives matched!");
+        completedLevels.add("level1");
+        updateProgress();
+      } else {
+        showFeedback("level1Feedback", false, `Keep going! You matched ${correct}/${total}.`);
+      }
+    }
+
+    function restartLevel1() {
+      matchPairs = {};
+      selectedArabic = null;
+      initLevel1();
+      document.getElementById("level1Feedback").style.display = "none";
+      document.getElementById("level1Score").style.display = "none";
+      if (completedLevels.has("level1")) {
+        completedLevels.delete("level1");
+        updateProgress();
+      }
+    }
+
+    // --- LEVEL 2: FILL ADJECTIVE ---
+    const l2Choices = {};
+
+    function initLevel2() {
+      const container = document.getElementById("level2Questions");
+      container.innerHTML = "";
+      shuffle([...fillBlankPhrases]).forEach((item, i) => {
+        const q = document.createElement("div");
+        q.className = "question-container";
+        q.innerHTML = `
+          <div style="text-align:center">
+            <p style="font-size:1.3em;margin-bottom:8px">
+              <span class="arabic-text-sm">${item.noun}</span> ______
+            </p>
+            <p style="font-size:0.9em;color:#6b7280">"${item.english}"</p>
+          </div>
+          <div class="options-group">
+            ${item.options.map(opt => `
+              <button class="option-btn arabic-text-sm" data-q="${i}" onclick="pickAdj(this, ${i})">${opt}</button>
+            `).join("")}
+          </div>
+        `;
+        q.dataset.correct = item.adj;
+        container.appendChild(q);
+      });
+    }
+
+    function pickAdj(btn, qIdx) {
+      const parent = btn.closest(".question-container");
+      parent.querySelectorAll(".option-btn").forEach(b => b.classList.remove("chosen"));
+      btn.classList.add("chosen");
+      l2Choices[qIdx] = btn.textContent.trim();
+    }
+
+    function checkLevel2() {
+      const questions = document.querySelectorAll("#level2Questions .question-container");
+      let correct = 0;
+      questions.forEach((q, i) => {
+        const expected = q.dataset.correct;
+        const chosen = q.querySelectorAll(".option-btn.chosen");
+        const isCorrect = l2Choices[i] === expected;
+        if (isCorrect) {
+          correct++;
+          chosen.forEach(b => { b.classList.remove("chosen"); b.classList.add("correct"); });
+        } else {
+          chosen.forEach(b => { b.classList.remove("chosen"); b.classList.add("wrong"); });
+        }
+      });
+      const total = questions.length;
+      showScore("level2Score", correct, total);
+      if (correct === total) {
+        showFeedback("level2Feedback", true, "🎉 All adjectives correct!");
+        completedLevels.add("level2");
+        updateProgress();
+      } else {
+        showFeedback("level2Feedback", false, `You got ${correct}/${total}. Try again!`);
+      }
+    }
+
+    function restartLevel2() {
+      for (const key in l2Choices) delete l2Choices[key];
+      initLevel2();
+      document.getElementById("level2Feedback").style.display = "none";
+      document.getElementById("level2Score").style.display = "none";
+      if (completedLevels.has("level2")) {
+        completedLevels.delete("level2");
+        updateProgress();
+      }
+    }
+
+    // --- LEVEL 3: TRANSLATION ---
+    function initLevel3() {
+      const container = document.getElementById("level3Questions");
+      container.innerHTML = "";
+      shuffle([...translations]).forEach((item, i) => {
+        const box = document.createElement("div");
+        box.className = "translation-box";
+        if (item.fromArabic) {
+          box.innerHTML = `
+            <h3>Translate to English:</h3>
+            <p class="arabic-text" style="text-align:center;font-size:1.6em">${item.text}</p>
+            <input type="text" class="translation-input" id="l3_input_${i}" placeholder="Type translation in English..." />
+          `;
+        } else {
+          box.innerHTML = `
+            <h3>Translate to Arabic:</h3>
+            <p style="text-align:center;font-size:1.2em;font-weight:600">${item.text}</p>
+            <input type="text" class="translation-input arabic-text" id="l3_input_${i}" placeholder="اكتب الترجمة هنا..." />
+          `;
+        }
+        box.dataset.answer = item.answer.toLowerCase().trim();
+        box.dataset.fromArabic = item.fromArabic;
+        container.appendChild(box);
+      });
+    }
+
+    function checkLevel3() {
+      const boxes = document.querySelectorAll("#level3Questions .translation-box");
+      let correct = 0;
+      boxes.forEach(box => {
+        const input = box.querySelector("input");
+        const userVal = input.value.trim().toLowerCase();
+        const answer = box.dataset.answer;
+        const fromArabic = box.dataset.fromArabic === "true";
+        let isCorrect = false;
+        if (fromArabic) {
+          if (userVal.includes(answer) || answer.includes(userVal)) isCorrect = true;
+        } else {
+          const norm = userVal.replace(/[\u064B-\u0652]/g, "").trim();
+          const normA = answer.replace(/[\u064B-\u0652]/g, "").trim();
+          if (norm === normA || norm.includes(normA) || normA.includes(norm)) isCorrect = true;
+        }
+        if (isCorrect) { correct++; box.style.border = "3px solid #10b981"; box.style.background = "#f0fdf4"; }
+        else { box.style.border = "3px solid #ef4444"; box.style.background = "#fef2f2"; }
+      });
+      const total = boxes.length;
+      showScore("level3Score", correct, total);
+      if (correct === total) {
+        showFeedback("level3Feedback", true, "🌍 All translations correct!");
+        completedLevels.add("level3");
+        updateProgress();
+      } else {
+        showFeedback("level3Feedback", false, `You got ${correct}/${total}. Keep practicing!`);
+      }
+    }
+
+    function restartLevel3() {
+      initLevel3();
+      document.getElementById("level3Feedback").style.display = "none";
+      document.getElementById("level3Score").style.display = "none";
+      if (completedLevels.has("level3")) {
+        completedLevels.delete("level3");
+        updateProgress();
+      }
+    }
+
+    // --- LEVEL 4: SENTENCE BUILDER ---
+    function initLevel4() {
+      const container = document.getElementById("level4Questions");
+      container.innerHTML = "";
+      shuffle([...sentenceBuilds]).forEach((q, i) => {
+        const qDiv = document.createElement("div");
+        qDiv.className = "question-container";
+        qDiv.innerHTML = `
+          <p><strong>${i+1}. Build:</strong> "${q.english}"</p>
+          <div class="word-bank">
+            <div class="word-chips" id="l4_bank_${i}"></div>
+          </div>
+          <div class="sentence-builder" id="l4_builder_${i}"></div>
+        `;
+        qDiv.dataset.correct = q.correct;
+        qDiv.dataset.idx = i;
+        container.appendChild(qDiv);
+
+        const bank = document.getElementById(`l4_bank_${i}`);
+        shuffle([...q.words]).forEach(w => {
+          const chip = document.createElement("span");
+          chip.className = "word-chip arabic-text-sm";
+          chip.textContent = w;
+          chip.addEventListener("click", function() {
+            if (this.classList.contains("used")) return;
+            document.getElementById(`l4_builder_${i}`).appendChild(this);
+            this.classList.add("used");
+          });
+          bank.appendChild(chip);
+        });
+      });
+    }
+
+    function checkLevel4() {
+      const questions = document.querySelectorAll("#level4Questions .question-container");
+      let correct = 0;
+      questions.forEach(q => {
+        const idx = q.dataset.idx;
+        const builder = document.getElementById(`l4_builder_${idx}`);
+        const words = Array.from(builder.querySelectorAll(".word-chip")).map(c => c.textContent.trim());
+        if (words.join(" ") === q.dataset.correct) { correct++; builder.style.border = "3px solid #10b981"; builder.style.background = "#f0fdf4"; }
+        else { builder.style.border = "3px solid #ef4444"; builder.style.background = "#fef2f2"; }
+      });
+      const total = questions.length;
+      showScore("level4Score", correct, total);
+      if (correct === total) {
+        showFeedback("level4Feedback", true, "🏗️ All sentences correct!");
+        completedLevels.add("level4");
+        updateProgress();
+      } else {
+        showFeedback("level4Feedback", false, `You got ${correct}/${total}. Try again!`);
+      }
+    }
+
+    function restartLevel4() {
+      initLevel4();
+      document.getElementById("level4Feedback").style.display = "none";
+      document.getElementById("level4Score").style.display = "none";
+      if (completedLevels.has("level4")) {
+        completedLevels.delete("level4");
+        updateProgress();
+      }
+    }
+
+    // --- INIT ---
+    initLevel1();
+    initLevel2();
+    initLevel3();
+    initLevel4();
+    updateProgress();
+  </script>
+</body>
+</html>

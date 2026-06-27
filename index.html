@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Madinah Arabic - Exercises</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: url("background.avif") no-repeat center center fixed;
+      background-size: cover;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .main-container {
+      max-width: 900px;
+      margin: 20px;
+      padding: 40px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 8px;
+      color: #1f2937;
+    }
+
+    .subtitle {
+      font-size: 1.1em;
+      color: #6b7280;
+      margin-bottom: 30px;
+    }
+
+    .chapter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+
+    .chapter-card {
+      padding: 30px 20px;
+      border-radius: 16px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.3s ease;
+      border: 2px solid #e5e7eb;
+      display: block;
+    }
+
+    .chapter-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+
+    .chapter-card.ch1 { background: linear-gradient(135deg, #fef3c7, #fde68a); border-color: #f59e0b; }
+    .chapter-card.ch2 { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-color: #3b82f6; }
+    .chapter-card.ch3 { background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-color: #10b981; }
+
+    .chapter-card .number {
+      font-size: 1.2em;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .chapter-card .title {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .chapter-card .desc {
+      font-size: 0.9em;
+      color: #4b5563;
+    }
+
+    .chapter-card .icon {
+      font-size: 2.5em;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 12px;
+    }
+
+    .badge {
+      padding: 3px 10px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 12px;
+      font-size: 0.75em;
+      font-weight: 600;
+    }
+
+    .footer {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 0.85em;
+      color: #9ca3af;
+    }
+    @media (max-width: 768px) {
+      .main-container { padding: 24px 16px; margin: 12px; }
+      h1 { font-size: 1.8em; }
+      .subtitle { font-size: 0.95em; }
+      .chapter-grid { gap: 14px; }
+      .chapter-card { padding: 22px 14px; }
+      .chapter-card .icon { font-size: 2em; }
+      .chapter-card .title { font-size: 1.2em; }
+    }
+
+    @media (max-width: 480px) {
+      .main-container { padding: 16px 10px; margin: 8px; }
+      h1 { font-size: 1.4em; }
+      .chapter-grid { grid-template-columns: 1fr; }
+      .chapter-card { padding: 18px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <h1>📚 Madinah Arabic</h1>
+    <p class="subtitle">Book 1 — Interactive Exercises</p>
+
+    <div class="chapter-grid">
+      <a href="chapter1_exercise.html" class="chapter-card ch1">
+        <span class="icon">🔤</span>
+        <div class="number">Chapter 1</div>
+        <div class="title">الدرس الأول</div>
+        <div class="desc">Basic Nouns, هذا/هذه, ما هذا؟</div>
+        <div class="badge-row">
+          <span class="badge">Word Match</span>
+          <span class="badge">Fill Blank</span>
+          <span class="badge">Translate</span>
+          <span class="badge">Sentence Builder</span>
+        </div>
+      </a>
+
+      <a href="chapter2_exercise.html" class="chapter-card ch2">
+        <span class="icon">🎨</span>
+        <div class="number">Chapter 2</div>
+        <div class="title">الدرس الثاني</div>
+        <div class="desc">Adjectives &amp; Descriptions</div>
+        <div class="badge-row">
+          <span class="badge">Adjective Match</span>
+          <span class="badge">Pick Adj.</span>
+          <span class="badge">Translate</span>
+          <span class="badge">Sentence Builder</span>
+        </div>
+      </a>
+
+      <a href="chapter3_exercise.html" class="chapter-card ch3">
+        <span class="icon">📍</span>
+        <div class="number">Chapter 3</div>
+        <div class="title">الدرس الثالث</div>
+        <div class="desc">Prepositions &amp; Location</div>
+        <div class="badge-row">
+          <span class="badge">Preposition Match</span>
+          <span class="badge">Fill Blank</span>
+          <span class="badge">Translate</span>
+          <span class="badge">Sentence Builder</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="footer">
+      <p>Madinah Arabic Book 1 — Shaykh Dr. V. 'Abdur-Raheem</p>
+      <p style="margin-top:4px">Open each chapter HTML directly, or serve this folder with any static file server</p>
+    </div>
+  </div>
+</body>
+</html>
