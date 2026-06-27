@@ -408,6 +408,38 @@
     .nav-btn.primary { background: #3b82f6; color: white; border-color: #3b82f6; }
     .nav-btn.primary:hover { background: #2563eb; }
 
+    .vocab-card {
+      background: #f9fafb;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-height: 90px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .vocab-card:hover { transform: scale(1.04); border-color: #3b82f6; box-shadow: 0 4px 12px rgba(59,130,246,0.2); }
+    .vocab-card .arabic { font-size: 1.4em; font-weight: 600; direction: rtl; }
+    .vocab-card .english { font-size: 0.85em; color: #6b7280; margin-top: 6px; transition: all 0.3s ease; }
+    .vocab-card .english.hidden { visibility: hidden; opacity: 0; max-height: 0; margin: 0; overflow: hidden; }
+    .vocab-card.revealed { background: #dbeafe; border-color: #3b82f6; }
+
+    .quiz-word-display {
+      text-align: center;
+      font-size: 2.2em;
+      direction: rtl;
+      padding: 20px;
+      background: #eff6ff;
+      border-radius: 12px;
+      margin: 15px 0;
+      border: 2px solid #bfdbfe;
+    }
+
     @media (max-width: 768px) {
       .header h1 { font-size: 1.6em; }
       .exercise-selector { flex-direction: column; align-items: center; }
@@ -464,6 +496,7 @@
       <button class="exercise-btn" onclick="showExercise('level2')">✏️ Level 2: Pick the Adj.</button>
       <button class="exercise-btn" onclick="showExercise('level3')">🌍 Level 3: Translate</button>
       <button class="exercise-btn" onclick="showExercise('level4')">🏗️ Level 4: Sentence Builder</button>
+      <button class="exercise-btn" onclick="showExercise('level5')">📚 Level 5: New Words</button>
     </div>
 
     <!-- Level 1: Adjective Matching -->
@@ -531,6 +564,33 @@
       <div class="feedback-message" id="level4Feedback"></div>
     </div>
 
+    <!-- Level 5: New Words -->
+    <div id="level5" class="exercise-container">
+      <span class="level-indicator">📚 Level 5: New Words (كلمات جديدة)</span>
+      <div class="instructions">
+        <strong>Review vocabulary from this lesson.</strong> Click a card to reveal the English translation, then test yourself with the quiz below.
+      </div>
+      <div style="margin-bottom:10px; text-align:center">
+        <button class="check-btn" style="display:inline; margin:0" onclick="toggleAllVocab()">👁️ Show All</button>
+      </div>
+      <div class="word-grid" id="vocabCards"></div>
+      <div id="vocabQuizSection" style="margin-top:25px; display:none">
+        <hr style="margin-bottom:20px">
+        <h3 style="text-align:center; margin-bottom:12px">🔍 Matching Quiz</h3>
+        <p class="hint">Choose the correct English translation</p>
+        <div class="quiz-word-display" id="quizWord"></div>
+        <div class="options-group" id="quizOptions"></div>
+        <p id="quizFeedback" class="feedback-message"></p>
+        <div style="text-align:center; font-size:1.2em; margin:10px 0; font-weight:600" id="quizProgress"></div>
+      </div>
+      <div class="btn-group">
+        <button class="check-btn" id="startQuizBtn" onclick="startVocabQuiz()">🎯 Start Quiz</button>
+        <button class="restart-btn" onclick="resetLevel5()">↺ Restart</button>
+      </div>
+      <div class="score-text" id="level5Score"></div>
+      <div class="feedback-message" id="level5Feedback"></div>
+    </div>
+
     <div class="score-board">
       <h3>🏆 Chapter Progress</h3>
       <div class="progress-bar">
@@ -577,14 +637,47 @@
       { fromArabic: true, text: "القَلَم مَكْسُور", answer: "The pen is broken" },
       { fromArabic: false, text: "The mosque is near", answer: "المَسْجِد قَرِيب" },
       { fromArabic: true, text: "المُدَرِّس جَالِس والطَّالِب وَاقِف", answer: "The teacher is sitting and the student is standing" },
-      { fromArabic: false, text: "The book is new and the pen is old", answer: "الكِتَاب جَدِيد والقَلَم قَدِيم" }
+      { fromArabic: false, text: "The book is new and the pen is old", answer: "الكِتَاب جَدِيد والقَلَم قَدِيم" },
+      { fromArabic: true, text: "الرَّجُل طَوِيل", answer: "The man is tall" },
+      { fromArabic: false, text: "The water is cold", answer: "المَاء بَارِد" },
+      { fromArabic: true, text: "البَيْت وَسِخ", answer: "The house is dirty" },
+      { fromArabic: false, text: "The flower is beautiful", answer: "الزَّهْرَة جَمِيلَة" }
     ];
 
     const sentenceBuilds = [
       { english: "The teacher is new", correct: "المُدَرِّس جَدِيد", words: ["المُدَرِّس", "الطَّالِب", "جَدِيد", "قَدِيم", "كَبِير"] },
       { english: "The pen is broken", correct: "القَلَم مَكْسُور", words: ["القَلَم", "الكِتَاب", "جَدِيد", "مَكْسُور", "نَظِيف"] },
       { english: "The mosque is near", correct: "المَسْجِد قَرِيب", words: ["المَسْجِد", "البَيْت", "قَرِيب", "بَعِيد", "كَبِير"] },
-      { english: "The book is new", correct: "الكِتَاب جَدِيد", words: ["الكِتَاب", "القَلَم", "جَدِيد", "قَدِيم", "صَغِير"] }
+      { english: "The book is new", correct: "الكِتَاب جَدِيد", words: ["الكِتَاب", "القَلَم", "جَدِيد", "قَدِيم", "صَغِير"] },
+      { english: "The man is tall", correct: "الرَّجُل طَوِيل", words: ["الرَّجُل", "الوَلَد", "طَوِيل", "قَصِير", "جَدِيد"] },
+      { english: "The water is cold", correct: "المَاء بَارِد", words: ["المَاء", "اللَّبَن", "بَارِد", "حَار", "نَظِيف"] }
+    ];
+
+    const newWords = [
+      { arabic: "جَدِيدٌ", english: "New" },
+      { arabic: "قَدِيمٌ", english: "Old" },
+      { arabic: "كَبِيرٌ", english: "Big" },
+      { arabic: "صَغِيرٌ", english: "Small" },
+      { arabic: "قَرِيبٌ", english: "Near" },
+      { arabic: "بَعِيدٌ", english: "Far" },
+      { arabic: "مَكْسُورٌ", english: "Broken" },
+      { arabic: "نَظِيفٌ", english: "Clean" },
+      { arabic: "جَالِسٌ", english: "Sitting" },
+      { arabic: "وَاقِفٌ", english: "Standing" },
+      { arabic: "طَوِيلٌ", english: "Tall" },
+      { arabic: "قَصِيرٌ", english: "Short" },
+      { arabic: "ثَقِيلٌ", english: "Heavy" },
+      { arabic: "خَفِيفٌ", english: "Light" },
+      { arabic: "بَارِدٌ", english: "Cold" },
+      { arabic: "حَارٌّ", english: "Hot" },
+      { arabic: "وَسِخٌ", english: "Dirty" },
+      { arabic: "جَمِيلٌ", english: "Beautiful" },
+      { arabic: "غَنِيٌّ", english: "Rich" },
+      { arabic: "فَقِيرٌ", english: "Poor" },
+      { arabic: "حُلْوٌ", english: "Sweet" },
+      { arabic: "مَرِيضٌ", english: "Sick" },
+      { arabic: "لَذِيذٌ", english: "Delicious" },
+      { arabic: "مَفْتُوحٌ", english: "Open" }
     ];
 
     // --- STATE ---
@@ -608,7 +701,7 @@
     }
 
     function updateProgress() {
-      const total = 4;
+      const total = 5;
       const count = completedLevels.size;
       const pct = (count / total) * 100;
       document.getElementById("progressBar").style.width = `${pct}%`;
@@ -901,11 +994,130 @@
       }
     }
 
+    // --- LEVEL 5: NEW WORDS ---
+    let vocabQuizWords = [];
+    let vocabQuizIndex = 0;
+    let vocabQuizCorrect = 0;
+    let allRevealed = false;
+
+    function initLevel5() {
+      const container = document.getElementById("vocabCards");
+      container.innerHTML = "";
+      allRevealed = false;
+      const shuffled = shuffle([...newWords]);
+      shuffled.forEach(w => {
+        const card = document.createElement("div");
+        card.className = "vocab-card";
+        card.innerHTML = `<div class="arabic">${w.arabic}</div><div class="english hidden">${w.english}</div>`;
+        card.addEventListener("click", function() {
+          const en = this.querySelector(".english");
+          en.classList.toggle("hidden");
+          this.classList.toggle("revealed");
+        });
+        container.appendChild(card);
+      });
+      document.getElementById("vocabQuizSection").style.display = "none";
+      document.getElementById("startQuizBtn").style.display = "inline-block";
+      document.getElementById("startQuizBtn").textContent = "🎯 Start Quiz";
+      document.getElementById("level5Score").style.display = "none";
+      document.getElementById("level5Feedback").style.display = "none";
+      document.getElementById("quizProgress").style.display = "none";
+    }
+
+    function toggleAllVocab() {
+      allRevealed = !allRevealed;
+      document.querySelectorAll("#vocabCards .vocab-card .english").forEach(el => {
+        el.classList.toggle("hidden", !allRevealed);
+      });
+      document.querySelectorAll("#vocabCards .vocab-card").forEach(el => {
+        el.classList.toggle("revealed", allRevealed);
+      });
+    }
+
+    function startVocabQuiz() {
+      vocabQuizWords = shuffle([...newWords]);
+      vocabQuizIndex = 0;
+      vocabQuizCorrect = 0;
+      document.getElementById("vocabQuizSection").style.display = "block";
+      document.getElementById("startQuizBtn").style.display = "none";
+      document.getElementById("level5Score").style.display = "none";
+      document.getElementById("level5Feedback").style.display = "none";
+      showVocabQuestion();
+    }
+
+    function showVocabQuestion() {
+      if (vocabQuizIndex >= vocabQuizWords.length) {
+        const total = vocabQuizWords.length;
+        showScore("level5Score", vocabQuizCorrect, total);
+        if (vocabQuizCorrect === total) {
+          showFeedback("level5Feedback", true, `🎉 Perfect! You know all ${total} words!`);
+          completedLevels.add("level5");
+          updateProgress();
+        } else {
+          showFeedback("level5Feedback", false, `You got ${vocabQuizCorrect}/${total}. Keep practicing!`);
+        }
+        document.getElementById("startQuizBtn").style.display = "inline-block";
+        document.getElementById("startQuizBtn").textContent = "🔄 Try Again";
+        document.getElementById("quizOptions").innerHTML = "";
+        document.getElementById("quizWord").textContent = "Quiz Complete!";
+        document.getElementById("quizProgress").style.display = "none";
+        return;
+      }
+
+      const word = vocabQuizWords[vocabQuizIndex];
+      document.getElementById("quizWord").textContent = word.arabic;
+      document.getElementById("quizFeedback").style.display = "none";
+
+      let options = [word.english];
+      const others = newWords.filter(w => w.english !== word.english);
+      const picked = shuffle(others).slice(0, 3);
+      options = shuffle([...options, ...picked.map(w => w.english)]);
+
+      const container = document.getElementById("quizOptions");
+      container.innerHTML = "";
+      options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = opt;
+        btn.addEventListener("click", function() {
+          if (this.classList.contains("correct") || this.classList.contains("wrong")) return;
+          document.querySelectorAll("#quizOptions .option-btn").forEach(b => b.style.pointerEvents = "none");
+          if (opt === word.english) {
+            this.classList.add("correct");
+            vocabQuizCorrect++;
+          } else {
+            this.classList.add("wrong");
+            document.querySelectorAll("#quizOptions .option-btn").forEach(b => {
+              if (b.textContent === word.english) b.classList.add("correct");
+            });
+          }
+          document.getElementById("quizProgress").textContent = `${vocabQuizIndex + 1} / ${vocabQuizWords.length}`;
+          setTimeout(() => {
+            vocabQuizIndex++;
+            showVocabQuestion();
+          }, 1000);
+        });
+        container.appendChild(btn);
+      });
+
+      document.getElementById("quizProgress").style.display = "block";
+      document.getElementById("quizProgress").textContent = `${vocabQuizIndex + 1} / ${vocabQuizWords.length}`;
+    }
+
+    function resetLevel5() {
+      initLevel5();
+      if (completedLevels.has("level5")) {
+        completedLevels.delete("level5");
+        updateProgress();
+      }
+    }
+
     // --- INIT ---
     initLevel1();
     initLevel2();
     initLevel3();
     initLevel4();
+    initLevel5();
     updateProgress();
   </script>
 </body>
