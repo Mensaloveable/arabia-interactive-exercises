@@ -13,25 +13,7 @@ Interactive HTML exercises for **Madinah Arabic Book 1** (Shaykh Dr. V. 'Abdur-R
 
 Each chapter has 4 levels: **Word Match**, **Fill the Blank**, **Translation**, **Sentence Builder**.
 
-## Usage
-
-Open any `.html` file directly in a browser, or serve the folder:
-
-```bash
-python3 -m http.server 8000
-# then visit http://localhost:8000
-```
-
 All files are self-contained — no build step, no server-side dependencies.
-
-## Hosting
-
-Since everything is static HTML+CSS+JS, you can deploy by dropping the `Arabia/` folder onto any static host:
-
-- **GitHub Pages** — push to a repo, enable Pages in Settings
-- **Netlify** — drag `Arabia/` folder onto https://app.netlify.com
-- **Vercel** — `npx vercel /path/to/Arabia --deploy`
-- **Cloudflare Pages** — connect your Git repo
 
 ## Background
 
