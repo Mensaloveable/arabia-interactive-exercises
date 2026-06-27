@@ -1042,11 +1042,15 @@
       document.getElementById("startQuizBtn").style.display = "none";
       document.getElementById("level5Score").style.display = "none";
       document.getElementById("level5Feedback").style.display = "none";
+      document.getElementById("vocabCards").style.pointerEvents = "none";
+      document.querySelectorAll("#vocabCards .vocab-card .english").forEach(el => el.classList.add("hidden"));
+      document.querySelectorAll("#vocabCards .vocab-card").forEach(el => el.classList.remove("revealed"));
       showVocabQuestion();
     }
 
     function showVocabQuestion() {
       if (vocabQuizIndex >= vocabQuizWords.length) {
+        document.getElementById("vocabCards").style.pointerEvents = "";
         const total = vocabQuizWords.length;
         showScore("level5Score", vocabQuizCorrect, total);
         if (vocabQuizCorrect === total) {
